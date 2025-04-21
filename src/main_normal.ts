@@ -1,5 +1,5 @@
 export{}
-// main.ts
+// main.ts変更練習
 const display = document.getElementById("display") as HTMLDivElement;
 const buttons = document.querySelectorAll(".btn");
 const reciprocalButton = document.querySelector(".btn.reciprocal");
