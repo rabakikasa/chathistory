@@ -14,7 +14,7 @@ window.addEventListener("load", function () {
 });
 // ボタンにショートカットキーの情報をツールチップとして追加する関数
 function setupButtonTooltips() {
-    var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m;
+    var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l;
     // 各ボタンに対応するショートカットキー情報を設定
     (_a = document.querySelector(".btn.sqrt")) === null || _a === void 0 ? void 0 : _a.setAttribute("title", "ショートカット: Alt+r");
     (_b = document.querySelector(".btn.e-power")) === null || _b === void 0 ? void 0 : _b.setAttribute("title", "ショートカット: Alt+e");
@@ -24,11 +24,10 @@ function setupButtonTooltips() {
     (_f = document.querySelector(".btn.power")) === null || _f === void 0 ? void 0 : _f.setAttribute("title", "ショートカット: ^");
     (_g = document.querySelector(".btn.bracket")) === null || _g === void 0 ? void 0 : _g.setAttribute("title", "ショートカット: (");
     (_h = document.querySelector(".btn.pi")) === null || _h === void 0 ? void 0 : _h.setAttribute("title", "ショートカット: Alt+i または π");
-    (_j = document.querySelector(".btn.floor")) === null || _j === void 0 ? void 0 : _j.setAttribute("title", "ショートカット: Alt+f");
     // 三角関数ボタンにショートカットキー情報を設定
-    (_k = document.querySelector(".btn.sin")) === null || _k === void 0 ? void 0 : _k.setAttribute("title", "ショートカット: Alt+s");
-    (_l = document.querySelector(".btn.cos")) === null || _l === void 0 ? void 0 : _l.setAttribute("title", "ショートカット: Alt+c");
-    (_m = document.querySelector(".btn.tan")) === null || _m === void 0 ? void 0 : _m.setAttribute("title", "ショートカット: Alt+t");
+    (_j = document.querySelector(".btn.sin")) === null || _j === void 0 ? void 0 : _j.setAttribute("title", "ショートカット: Alt+s");
+    (_k = document.querySelector(".btn.cos")) === null || _k === void 0 ? void 0 : _k.setAttribute("title", "ショートカット: Alt+c");
+    (_l = document.querySelector(".btn.tan")) === null || _l === void 0 ? void 0 : _l.setAttribute("title", "ショートカット: Alt+t");
     // 基本的な演算子とその他のキーにもツールチップを追加
     var buttonTooltips = {
         "+": "ショートカット: +",
@@ -168,14 +167,6 @@ buttons.forEach(function (btn) {
         });
         return;
     }
-    if (btn.classList.contains("floor")) {
-        btn.addEventListener("click", function () {
-            display.focus();
-            insertFunctionCallAtCaret(display, "floor");
-            placeCaretAtEnd(display);
-        });
-        return;
-    }
     btn.addEventListener("click", function () {
         var _a;
         display.focus();
@@ -284,12 +275,6 @@ document.addEventListener("keydown", function (event) {
             insertFunctionCallAtCaret(display, "tan");
             return;
         }
-        // floorのショートカット (f)
-        if (event.key === "f" && event.altKey) {
-            event.preventDefault();
-            insertFunctionCallAtCaret(display, "floor");
-            return;
-        }
         event.preventDefault();
         return;
     }
@@ -393,7 +378,7 @@ function placeCaretAtEnd(el) {
 // 計算関数は前の evaluateExpression を使ってOK！
 // --- 文字列をトークンに分ける ---
 function tokenize(expression) {
-    return expression.match(/(sin|cos|tan|e\^|loge|log|sqrt|floor|\d+\.?\d*|\.\d+|\+|\-|\*|\/|\^|!|\(|\))/g) || [];
+    return expression.match(/(sin|cos|tan|e\^|loge|log|sqrt|\d+\.?\d*|\.\d+|\+|\-|\*|\/|\^|!|\(|\))/g) || [];
 }
 // --- 計算処理（演算子の優先順位を守る） ---
 function calculate(tokens) {
@@ -417,10 +402,10 @@ function calculate(tokens) {
         }
     }
     var maxIterations = 1000; // 無限ループ防止用
-    // ① 関数の処理（sin, cos, tan, log, loge, sqrt, e^, floor）
+    // ① 関数の処理（sin, cos, tan, log, loge, sqrt）
     var i = 0;
     while (i < tokens.length && maxIterations > 0) {
-        if (["sin", "cos", "tan", "log", "loge", "sqrt", "e^", "floor"].includes(tokens[i])) {
+        if (["sin", "cos", "tan", "log", "loge", "sqrt", "e^"].includes(tokens[i])) {
             if (i >= tokens.length - 1) {
                 throw new Error("\u4E0D\u6B63\u306A".concat(tokens[i], "\u95A2\u6570\u306E\u4F7F\u7528\u3067\u3059"));
             }
@@ -456,9 +441,6 @@ function calculate(tokens) {
                     break;
                 case "e^":
                     result = Math.exp(arg);
-                    break;
-                case "floor":
-                    result = Math.floor(arg);
                     break;
                 default:
                     throw new Error("未実装の関数です");

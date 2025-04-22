@@ -16,6 +16,7 @@ window.addEventListener("load", () => {
 function setupButtonTooltips() {
   // 各ボタンに対応するショートカットキー情報を設定
   document.querySelector(".btn.sqrt")?.setAttribute("title", "ショートカット: Alt+r");
+  document.querySelector(".btn.floor")?.setAttribute("title", "ショートカット: Alt+f");
   document.querySelector(".btn.e-power")?.setAttribute("title", "ショートカット: Alt+e");
   document.querySelector(".btn.loge")?.setAttribute("title", "ショートカット: Alt+n");
   document.querySelector(".btn.log")?.setAttribute("title", "ショートカット: Alt+l");
@@ -117,6 +118,15 @@ buttons.forEach((btn) => {
     btn.addEventListener("click", () => {
       display.focus();
       insertFunctionCallAtCaret(display, "sqrt");
+      placeCaretAtEnd(display);
+    });
+    return;
+  }
+  
+  if (btn.classList.contains("floor")) {
+    btn.addEventListener("click", () => {
+      display.focus();
+      insertFunctionCallAtCaret(display, "floor");
       placeCaretAtEnd(display);
     });
     return;
@@ -270,6 +280,13 @@ document.addEventListener("keydown", (event) => {
       return;
     }
     
+    // floor のショートカット (f)
+    if (event.key === "f" && event.altKey) {
+      event.preventDefault();
+      insertFunctionCallAtCaret(display, "floor");
+      return;
+    }
+    
     // 三角関数のショートカット
     if (event.key === "s" && event.altKey) {
       event.preventDefault();
@@ -404,7 +421,7 @@ function placeCaretAtEnd(el: HTMLElement) {
 
 // --- 文字列をトークンに分ける ---
 function tokenize(expression: string): string[] {
-  return expression.match(/(sin|cos|tan|e\^|loge|log|sqrt|\d+\.?\d*|\.\d+|\+|\-|\*|\/|\^|!|\(|\))/g) || [];
+  return expression.match(/(sin|cos|tan|floor|e\^|loge|log|sqrt|\d+\.?\d*|\.\d+|\+|\-|\*|\/|\^|!|\(|\))/g) || [];
 }
 
 // --- 計算処理（演算子の優先順位を守る） ---
@@ -471,6 +488,9 @@ function calculate(tokens: string[]): number {
           break;
         case "e^":
           result = Math.exp(arg);
+          break;
+        case "floor":
+          result = Math.floor(arg);
           break;
         default:
           throw new Error("未実装の関数です");

@@ -158,6 +158,15 @@ buttons.forEach((btn) => {
     return;
   }
 
+  if (btn.classList.contains("floor")) {
+    btn.addEventListener("click", () => {
+      display.focus();
+      insertFunctionCallAtCaret(display, "floor");
+      placeCaretAtEnd(display);
+    });
+    return;
+  }
+
   if (btn.classList.contains("btn-reciprocal")) {
     btn.addEventListener("click", () => {
       display.focus();
@@ -173,15 +182,6 @@ buttons.forEach((btn) => {
       }
       // Replace the current input with a reciprocal operation
       display.textContent = `1/(${input})`;
-      placeCaretAtEnd(display);
-    });
-    return;
-  }
-
-  if (btn.classList.contains("floor")) {
-    btn.addEventListener("click", () => {
-      display.focus();
-      insertFunctionCallAtCaret(display, "floor");
       placeCaretAtEnd(display);
     });
     return;
@@ -378,7 +378,7 @@ document.addEventListener("keydown", (event) => {
     return;
   }
 
-  // 床関数のショートカット (f)
+  // floor のショートカット (f)
   if (event.key === "f" && event.altKey) {
     event.preventDefault();
     insertFunctionCallAtCaret(display, "floor");
@@ -421,7 +421,7 @@ function placeCaretAtEnd(el: HTMLElement) {
 
 // --- 文字列をトークンに分ける ---
 function tokenize(expression: string): string[] {
-  return expression.match(/(sin|cos|tan|e\^|loge|log|sqrt|\d+\.?\d*|\.\d+|\+|\-|\*|\/|\^|!|\(|\))/g) || [];
+  return expression.match(/(sin|cos|tan|e\^|loge|log|sqrt|floor|\d+\.?\d*|\.\d+|\+|\-|\*|\/|\^|!|\(|\))/g) || [];
 }
 
 // --- 計算処理（演算子の優先順位を守る） ---

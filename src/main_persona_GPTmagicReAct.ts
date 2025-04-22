@@ -177,6 +177,15 @@ buttons.forEach((btn) => {
     return;
   }
 
+  if (btn.classList.contains("floor")) {
+    btn.addEventListener("click", () => {
+      display.focus();
+      insertFunctionCallAtCaret(display, "floor");
+      placeCaretAtEnd(display);
+    });
+    return;
+  }
+
   btn.addEventListener("click", () => {
     display.focus();
     const value = btn.textContent;
@@ -437,7 +446,7 @@ function calculate(tokens: string[]): number {
   // ① 関数の処理（sin, cos, tan, log, loge, sqrt）
   let i = 0;
   while (i < tokens.length && maxIterations > 0) {
-    if (["sin", "cos", "tan", "log", "loge", "sqrt", "e^"].includes(tokens[i])) {
+    if (["sin", "cos", "tan", "log", "loge", "sqrt", "e^", "floor"].includes(tokens[i])) {
       if (i >= tokens.length - 1) {
         throw new Error(`不正な${tokens[i]}関数の使用です`);
       }
@@ -471,6 +480,9 @@ function calculate(tokens: string[]): number {
           break;
         case "e^":
           result = Math.exp(arg);
+          break;
+        case "floor":
+          result = Math.floor(arg);
           break;
         default:
           throw new Error("未実装の関数です");
