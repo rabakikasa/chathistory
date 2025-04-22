@@ -1,0 +1,11 @@
+version: '2'
+plugins:
+  eslint:
+    enabled: true
+    channel: eslint-8
+ratings:
+  paths:
+    - "src"
+exclude_paths:
+  - "node_modules/**"
+  - "dist/**"
