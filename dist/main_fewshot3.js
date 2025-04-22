@@ -148,6 +148,14 @@ buttons.forEach(function (btn) {
         });
         return;
     }
+    if (btn.classList.contains("floor")) {
+        btn.addEventListener("click", function () {
+            display.focus();
+            insertFunctionCallAtCaret(display, "floor");
+            placeCaretAtEnd(display);
+        });
+        return;
+    }
     if (btn.classList.contains("btn-reciprocal")) {
         btn.addEventListener("click", function () {
             var _a;
@@ -164,14 +172,6 @@ buttons.forEach(function (btn) {
             }
             // Replace the current input with a reciprocal operation
             display.textContent = "1/(".concat(input, ")");
-            placeCaretAtEnd(display);
-        });
-        return;
-    }
-    if (btn.classList.contains("floor")) {
-        btn.addEventListener("click", function () {
-            display.focus();
-            insertFunctionCallAtCaret(display, "floor");
             placeCaretAtEnd(display);
         });
         return;
@@ -237,6 +237,12 @@ document.addEventListener("keydown", function (event) {
             insertPiAtCaret(display);
             return;
         }
+        // 床関数のショートカット (f)
+        if (event.key === "f" && event.altKey) {
+            event.preventDefault();
+            insertFunctionCallAtCaret(display, "floor");
+            return;
+        }
         // 特殊キーのショートカット処理
         if (event.key === "r" && event.altKey) {
             event.preventDefault();
@@ -282,12 +288,6 @@ document.addEventListener("keydown", function (event) {
         if (event.key === "t" && event.altKey) {
             event.preventDefault();
             insertFunctionCallAtCaret(display, "tan");
-            return;
-        }
-        // floor関数のショートカット (f)
-        if (event.key === "f" && event.altKey) {
-            event.preventDefault();
-            insertFunctionCallAtCaret(display, "floor");
             return;
         }
         event.preventDefault();

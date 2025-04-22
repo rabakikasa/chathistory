@@ -284,7 +284,7 @@ document.addEventListener("keydown", function (event) {
             insertFunctionCallAtCaret(display, "tan");
             return;
         }
-        // floor関数のショートカット (f)
+        // floorのショートカット (f)
         if (event.key === "f" && event.altKey) {
             event.preventDefault();
             insertFunctionCallAtCaret(display, "floor");
@@ -393,7 +393,7 @@ function placeCaretAtEnd(el) {
 // 計算関数は前の evaluateExpression を使ってOK！
 // --- 文字列をトークンに分ける ---
 function tokenize(expression) {
-    return expression.match(/(sin|cos|tan|e\^|loge|log|sqrt|\d+\.?\d*|\.\d+|\+|\-|\*|\/|\^|!|\(|\))/g) || [];
+    return expression.match(/(sin|cos|tan|e\^|loge|log|sqrt|floor|\d+\.?\d*|\.\d+|\+|\-|\*|\/|\^|!|\(|\))/g) || [];
 }
 // --- 計算処理（演算子の優先順位を守る） ---
 function calculate(tokens) {
@@ -417,7 +417,7 @@ function calculate(tokens) {
         }
     }
     var maxIterations = 1000; // 無限ループ防止用
-    // ① 関数の処理（sin, cos, tan, log, loge, sqrt）
+    // ① 関数の処理（sin, cos, tan, log, loge, sqrt, e^, floor）
     var i = 0;
     while (i < tokens.length && maxIterations > 0) {
         if (["sin", "cos", "tan", "log", "loge", "sqrt", "e^", "floor"].includes(tokens[i])) {

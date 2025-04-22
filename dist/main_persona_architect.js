@@ -20,11 +20,11 @@ function setupButtonTooltips() {
     (_b = document.querySelector(".btn.e-power")) === null || _b === void 0 ? void 0 : _b.setAttribute("title", "ショートカット: Alt+e");
     (_c = document.querySelector(".btn.loge")) === null || _c === void 0 ? void 0 : _c.setAttribute("title", "ショートカット: Alt+n");
     (_d = document.querySelector(".btn.log")) === null || _d === void 0 ? void 0 : _d.setAttribute("title", "ショートカット: Alt+l");
-    (_e = document.querySelector(".btn.factorial")) === null || _e === void 0 ? void 0 : _e.setAttribute("title", "ショートカット: !");
-    (_f = document.querySelector(".btn.power")) === null || _f === void 0 ? void 0 : _f.setAttribute("title", "ショートカット: ^");
-    (_g = document.querySelector(".btn.bracket")) === null || _g === void 0 ? void 0 : _g.setAttribute("title", "ショートカット: (");
-    (_h = document.querySelector(".btn.pi")) === null || _h === void 0 ? void 0 : _h.setAttribute("title", "ショートカット: Alt+i または π");
-    (_j = document.querySelector(".btn.floor")) === null || _j === void 0 ? void 0 : _j.setAttribute("title", "ショートカット: Alt+f");
+    (_e = document.querySelector(".btn.floor")) === null || _e === void 0 ? void 0 : _e.setAttribute("title", "ショートカット: Alt+f");
+    (_f = document.querySelector(".btn.factorial")) === null || _f === void 0 ? void 0 : _f.setAttribute("title", "ショートカット: !");
+    (_g = document.querySelector(".btn.power")) === null || _g === void 0 ? void 0 : _g.setAttribute("title", "ショートカット: ^");
+    (_h = document.querySelector(".btn.bracket")) === null || _h === void 0 ? void 0 : _h.setAttribute("title", "ショートカット: (");
+    (_j = document.querySelector(".btn.pi")) === null || _j === void 0 ? void 0 : _j.setAttribute("title", "ショートカット: Alt+i または π");
     // 三角関数ボタンにショートカットキー情報を設定
     (_k = document.querySelector(".btn.sin")) === null || _k === void 0 ? void 0 : _k.setAttribute("title", "ショートカット: Alt+s");
     (_l = document.querySelector(".btn.cos")) === null || _l === void 0 ? void 0 : _l.setAttribute("title", "ショートカット: Alt+c");
@@ -250,6 +250,12 @@ document.addEventListener("keydown", function (event) {
             placeCaretAtEnd(display);
             return;
         }
+        // floor関数のショートカット (f)
+        if (event.key === "f" && event.altKey) {
+            event.preventDefault();
+            insertFunctionCallAtCaret(display, "floor");
+            return;
+        }
         // e累乗のショートカット (e)
         if (event.key === "e" && event.altKey) {
             event.preventDefault();
@@ -282,12 +288,6 @@ document.addEventListener("keydown", function (event) {
         if (event.key === "t" && event.altKey) {
             event.preventDefault();
             insertFunctionCallAtCaret(display, "tan");
-            return;
-        }
-        // floor関数のショートカット (f)
-        if (event.key === "f" && event.altKey) {
-            event.preventDefault();
-            insertFunctionCallAtCaret(display, "floor");
             return;
         }
         event.preventDefault();
@@ -417,7 +417,7 @@ function calculate(tokens) {
         }
     }
     var maxIterations = 1000; // 無限ループ防止用
-    // ① 関数の処理（sin, cos, tan, log, loge, sqrt）
+    // ① 関数の処理（sin, cos, tan, log, loge, sqrt, floor）
     var i = 0;
     while (i < tokens.length && maxIterations > 0) {
         if (["sin", "cos", "tan", "log", "loge", "sqrt", "e^", "floor"].includes(tokens[i])) {

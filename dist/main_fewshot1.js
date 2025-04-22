@@ -14,7 +14,7 @@ window.addEventListener("load", function () {
 });
 // ボタンにショートカットキーの情報をツールチップとして追加する関数
 function setupButtonTooltips() {
-    var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m;
+    var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m, _o;
     // 各ボタンに対応するショートカットキー情報を設定
     (_a = document.querySelector(".btn.sqrt")) === null || _a === void 0 ? void 0 : _a.setAttribute("title", "ショートカット: Alt+r");
     (_b = document.querySelector(".btn.e-power")) === null || _b === void 0 ? void 0 : _b.setAttribute("title", "ショートカット: Alt+e");
@@ -24,11 +24,12 @@ function setupButtonTooltips() {
     (_f = document.querySelector(".btn.power")) === null || _f === void 0 ? void 0 : _f.setAttribute("title", "ショートカット: ^");
     (_g = document.querySelector(".btn.bracket")) === null || _g === void 0 ? void 0 : _g.setAttribute("title", "ショートカット: (");
     (_h = document.querySelector(".btn.pi")) === null || _h === void 0 ? void 0 : _h.setAttribute("title", "ショートカット: Alt+i または π");
-    (_j = document.querySelector(".btn.floor")) === null || _j === void 0 ? void 0 : _j.setAttribute("title", "ショートカット: Alt+f");
+    (_j = document.querySelector(".btn.abs")) === null || _j === void 0 ? void 0 : _j.setAttribute("title", "ショートカット: Alt+a");
+    (_k = document.querySelector(".btn.floor")) === null || _k === void 0 ? void 0 : _k.setAttribute("title", "ショートカット: Alt+f");
     // 三角関数ボタンにショートカットキー情報を設定
-    (_k = document.querySelector(".btn.sin")) === null || _k === void 0 ? void 0 : _k.setAttribute("title", "ショートカット: Alt+s");
-    (_l = document.querySelector(".btn.cos")) === null || _l === void 0 ? void 0 : _l.setAttribute("title", "ショートカット: Alt+c");
-    (_m = document.querySelector(".btn.tan")) === null || _m === void 0 ? void 0 : _m.setAttribute("title", "ショートカット: Alt+t");
+    (_l = document.querySelector(".btn.sin")) === null || _l === void 0 ? void 0 : _l.setAttribute("title", "ショートカット: Alt+s");
+    (_m = document.querySelector(".btn.cos")) === null || _m === void 0 ? void 0 : _m.setAttribute("title", "ショートカット: Alt+c");
+    (_o = document.querySelector(".btn.tan")) === null || _o === void 0 ? void 0 : _o.setAttribute("title", "ショートカット: Alt+t");
     // 基本的な演算子とその他のキーにもツールチップを追加
     var buttonTooltips = {
         "+": "ショートカット: +",
@@ -171,7 +172,7 @@ buttons.forEach(function (btn) {
     if (btn.classList.contains("floor")) {
         btn.addEventListener("click", function () {
             display.focus();
-            insertFunctionCallAtCaret(display, "floor");
+            insertFloorAtCaret(display);
             placeCaretAtEnd(display);
         });
         return;
@@ -284,12 +285,6 @@ document.addEventListener("keydown", function (event) {
             insertFunctionCallAtCaret(display, "tan");
             return;
         }
-        // floor関数のショートカット (f)
-        if (event.key === "f" && event.altKey) {
-            event.preventDefault();
-            insertFunctionCallAtCaret(display, "floor");
-            return;
-        }
         event.preventDefault();
         return;
     }
@@ -393,7 +388,7 @@ function placeCaretAtEnd(el) {
 // 計算関数は前の evaluateExpression を使ってOK！
 // --- 文字列をトークンに分ける ---
 function tokenize(expression) {
-    return expression.match(/(sin|cos|tan|e\^|loge|log|sqrt|\d+\.?\d*|\.\d+|\+|\-|\*|\/|\^|!|\(|\))/g) || [];
+    return expression.match(/(sin|cos|tan|e\^|loge|log|sqrt|floor|\d+\.?\d*|\.\d+|\+|\-|\*|\/|\^|!|\(|\)|\⌊|\⌋)/g) || [];
 }
 // --- 計算処理（演算子の優先順位を守る） ---
 function calculate(tokens) {
@@ -658,7 +653,7 @@ function evaluateExpression(expression) {
         // 括弧の直後に数字がある場合も * を挿入（例: (3+4)2 → (3+4)*2）
         expression = expression.replace(/(\))(\d+\.?\d*)/g, "$1*$2");
         // 数字と関数名の間に * を挿入（例: 2log(10) → 2*log(10)）
-        expression = expression.replace(/(\d+\.?\d*)(log|loge|sqrt|sin|cos|tan)/g, "$1*$2");
+        expression = expression.replace(/(\d+\.?\d*)(log|loge|sqrt|sin|cos|tan|floor)/g, "$1*$2");
         // 3. かっこを中から外へ順に評価
         var maxBracketIterations = 100; // 無限ループ防止用
         while (expression.includes("(") && maxBracketIterations > 0) {
@@ -844,6 +839,38 @@ function insertAbsAtCaret(el) {
         // 入力がある場合は、現在の入力の後に || を追加
         el.textContent = content + "||";
         // カーソルを || の間に配置
+        var newRange = document.createRange();
+        newRange.setStart(el.firstChild || el, content.length + 1);
+        newRange.collapse(true);
+        selection.removeAllRanges();
+        selection.addRange(newRange);
+    }
+}
+// 床関数記号を挿入する関数
+function insertFloorAtCaret(el) {
+    var _a;
+    // Clear display if it only contains "0"
+    if ((((_a = el.textContent) !== null && _a !== void 0 ? _a : "").trim()) === "0") {
+        el.textContent = "";
+    }
+    var selection = window.getSelection();
+    if (!selection || !selection.rangeCount)
+        return;
+    var range = selection.getRangeAt(0);
+    var content = el.textContent || "";
+    if (!content) {
+        // 入力が空の場合は ⌊⌋ を挿入し、カーソルを中央に
+        el.textContent = "⌊⌋";
+        var newRange = document.createRange();
+        newRange.setStart(el.firstChild || el, 1);
+        newRange.collapse(true);
+        selection.removeAllRanges();
+        selection.addRange(newRange);
+    }
+    else {
+        // 入力がある場合は、現在の入力の後に ⌊⌋ を追加
+        el.textContent = content + "⌊⌋";
+        // カーソルを ⌊⌋ の間に配置
         var newRange = document.createRange();
         newRange.setStart(el.firstChild || el, content.length + 1);
         newRange.collapse(true);

@@ -18,13 +18,13 @@ function setupButtonTooltips() {
     // 各ボタンに対応するショートカットキー情報を設定
     (_a = document.querySelector(".btn.sqrt")) === null || _a === void 0 ? void 0 : _a.setAttribute("title", "ショートカット: Alt+r");
     (_b = document.querySelector(".btn.e-power")) === null || _b === void 0 ? void 0 : _b.setAttribute("title", "ショートカット: Alt+e");
-    (_c = document.querySelector(".btn.loge")) === null || _c === void 0 ? void 0 : _c.setAttribute("title", "ショートカット: Alt+n");
-    (_d = document.querySelector(".btn.log")) === null || _d === void 0 ? void 0 : _d.setAttribute("title", "ショートカット: Alt+l");
-    (_e = document.querySelector(".btn.factorial")) === null || _e === void 0 ? void 0 : _e.setAttribute("title", "ショートカット: !");
-    (_f = document.querySelector(".btn.power")) === null || _f === void 0 ? void 0 : _f.setAttribute("title", "ショートカット: ^");
-    (_g = document.querySelector(".btn.bracket")) === null || _g === void 0 ? void 0 : _g.setAttribute("title", "ショートカット: (");
-    (_h = document.querySelector(".btn.pi")) === null || _h === void 0 ? void 0 : _h.setAttribute("title", "ショートカット: Alt+i または π");
-    (_j = document.querySelector(".btn.floor")) === null || _j === void 0 ? void 0 : _j.setAttribute("title", "ショートカット: Alt+f");
+    (_c = document.querySelector(".btn.floor")) === null || _c === void 0 ? void 0 : _c.setAttribute("title", "ショートカット: Alt+f");
+    (_d = document.querySelector(".btn.loge")) === null || _d === void 0 ? void 0 : _d.setAttribute("title", "ショートカット: Alt+n");
+    (_e = document.querySelector(".btn.log")) === null || _e === void 0 ? void 0 : _e.setAttribute("title", "ショートカット: Alt+l");
+    (_f = document.querySelector(".btn.factorial")) === null || _f === void 0 ? void 0 : _f.setAttribute("title", "ショートカット: !");
+    (_g = document.querySelector(".btn.power")) === null || _g === void 0 ? void 0 : _g.setAttribute("title", "ショートカット: ^");
+    (_h = document.querySelector(".btn.bracket")) === null || _h === void 0 ? void 0 : _h.setAttribute("title", "ショートカット: (");
+    (_j = document.querySelector(".btn.pi")) === null || _j === void 0 ? void 0 : _j.setAttribute("title", "ショートカット: Alt+i または π");
     // 三角関数ボタンにショートカットキー情報を設定
     (_k = document.querySelector(".btn.sin")) === null || _k === void 0 ? void 0 : _k.setAttribute("title", "ショートカット: Alt+s");
     (_l = document.querySelector(".btn.cos")) === null || _l === void 0 ? void 0 : _l.setAttribute("title", "ショートカット: Alt+c");
@@ -284,7 +284,7 @@ document.addEventListener("keydown", function (event) {
             insertFunctionCallAtCaret(display, "tan");
             return;
         }
-        // floor関数のショートカット (f)
+        // Floor function shortcut (f)
         if (event.key === "f" && event.altKey) {
             event.preventDefault();
             insertFunctionCallAtCaret(display, "floor");
@@ -393,7 +393,7 @@ function placeCaretAtEnd(el) {
 // 計算関数は前の evaluateExpression を使ってOK！
 // --- 文字列をトークンに分ける ---
 function tokenize(expression) {
-    return expression.match(/(sin|cos|tan|e\^|loge|log|sqrt|\d+\.?\d*|\.\d+|\+|\-|\*|\/|\^|!|\(|\))/g) || [];
+    return expression.match(/(sin|cos|tan|floor|e\^|loge|log|sqrt|\d+\.?\d*|\.\d+|\+|\-|\*|\/|\^|!|\(|\))/g) || [];
 }
 // --- 計算処理（演算子の優先順位を守る） ---
 function calculate(tokens) {
@@ -420,7 +420,7 @@ function calculate(tokens) {
     // ① 関数の処理（sin, cos, tan, log, loge, sqrt）
     var i = 0;
     while (i < tokens.length && maxIterations > 0) {
-        if (["sin", "cos", "tan", "log", "loge", "sqrt", "e^", "floor"].includes(tokens[i])) {
+        if (["sin", "cos", "tan", "log", "loge", "sqrt", "e^"].includes(tokens[i])) {
             if (i >= tokens.length - 1) {
                 throw new Error("\u4E0D\u6B63\u306A".concat(tokens[i], "\u95A2\u6570\u306E\u4F7F\u7528\u3067\u3059"));
             }
@@ -439,6 +439,9 @@ function calculate(tokens) {
                 case "tan":
                     result = Math.tan(arg);
                     break;
+                case "floor":
+                    result = Math.floor(arg);
+                    break;
                 case "log":
                     if (arg <= 0)
                         throw new Error("常用対数の引数は正の数である必要があります");
@@ -456,9 +459,6 @@ function calculate(tokens) {
                     break;
                 case "e^":
                     result = Math.exp(arg);
-                    break;
-                case "floor":
-                    result = Math.floor(arg);
                     break;
                 default:
                     throw new Error("未実装の関数です");

@@ -17,6 +17,7 @@ function setupButtonTooltips() {
   // 各ボタンに対応するショートカットキー情報を設定
   document.querySelector(".btn.sqrt")?.setAttribute("title", "ショートカット: Alt+r");
   document.querySelector(".btn.e-power")?.setAttribute("title", "ショートカット: Alt+e");
+  document.querySelector(".btn.floor")?.setAttribute("title", "ショートカット: Alt+f");
   document.querySelector(".btn.loge")?.setAttribute("title", "ショートカット: Alt+n");
   document.querySelector(".btn.log")?.setAttribute("title", "ショートカット: Alt+l");
   document.querySelector(".btn.factorial")?.setAttribute("title", "ショートカット: !");
@@ -177,6 +178,15 @@ buttons.forEach((btn) => {
     return;
   }
 
+  if (btn.classList.contains("floor")) {
+    btn.addEventListener("click", () => {
+      display.focus();
+      insertFunctionCallAtCaret(display, "floor");
+      placeCaretAtEnd(display);
+    });
+    return;
+  }
+
   btn.addEventListener("click", () => {
     display.focus();
     const value = btn.textContent;
@@ -284,6 +294,13 @@ document.addEventListener("keydown", (event) => {
     if (event.key === "t" && event.altKey) {
       event.preventDefault();
       insertFunctionCallAtCaret(display, "tan");
+      return;
+    }
+    
+    // Floor function shortcut (f)
+    if (event.key === "f" && event.altKey) {
+      event.preventDefault();
+      insertFunctionCallAtCaret(display, "floor");
       return;
     }
     
@@ -404,7 +421,7 @@ function placeCaretAtEnd(el: HTMLElement) {
 
 // --- 文字列をトークンに分ける ---
 function tokenize(expression: string): string[] {
-  return expression.match(/(sin|cos|tan|e\^|loge|log|sqrt|\d+\.?\d*|\.\d+|\+|\-|\*|\/|\^|!|\(|\))/g) || [];
+  return expression.match(/(sin|cos|tan|floor|e\^|loge|log|sqrt|\d+\.?\d*|\.\d+|\+|\-|\*|\/|\^|!|\(|\))/g) || [];
 }
 
 // --- 計算処理（演算子の優先順位を守る） ---
@@ -456,6 +473,9 @@ function calculate(tokens: string[]): number {
           break;
         case "tan":
           result = Math.tan(arg);
+          break;
+        case "floor":
+          result = Math.floor(arg);
           break;
         case "log":
           if (arg <= 0) throw new Error("常用対数の引数は正の数である必要があります");

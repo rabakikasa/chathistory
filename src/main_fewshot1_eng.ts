@@ -23,6 +23,7 @@ function setupButtonTooltips() {
   document.querySelector(".btn.power")?.setAttribute("title", "ショートカット: ^");
   document.querySelector(".btn.bracket")?.setAttribute("title", "ショートカット: (");
   document.querySelector(".btn.pi")?.setAttribute("title", "ショートカット: Alt+i または π");
+  document.querySelector(".btn.floor")?.setAttribute("title", "ショートカット: Alt+f");
   
   // 三角関数ボタンにショートカットキー情報を設定
   document.querySelector(".btn.sin")?.setAttribute("title", "ショートカット: Alt+s");
@@ -172,6 +173,15 @@ buttons.forEach((btn) => {
       }
       // Replace the current input with a reciprocal operation
       display.textContent = `1/(${input})`;
+      placeCaretAtEnd(display);
+    });
+    return;
+  }
+
+  if (btn.classList.contains("floor")) {
+    btn.addEventListener("click", () => {
+      display.focus();
+      insertFloorAtCaret(display);
       placeCaretAtEnd(display);
     });
     return;
@@ -367,6 +377,13 @@ document.addEventListener("keydown", (event) => {
     insertAtCaret(display, event.key);
     return;
   }
+
+  // Floor function shortcut (f)
+  if (event.key === "f" && event.altKey) {
+    event.preventDefault();
+    insertFloorAtCaret(display);
+    return;
+  }
 });
 
 
@@ -404,7 +421,7 @@ function placeCaretAtEnd(el: HTMLElement) {
 
 // --- 文字列をトークンに分ける ---
 function tokenize(expression: string): string[] {
-  return expression.match(/(sin|cos|tan|e\^|loge|log|sqrt|\d+\.?\d*|\.\d+|\+|\-|\*|\/|\^|!|\(|\))/g) || [];
+  return expression.match(/(sin|cos|tan|e\^|loge|log|sqrt|floor|\d+\.?\d*|\.\d+|\+|\-|\*|\/|\^|!|\(|\)|\⌊|\⌋)/g) || [];
 }
 
 // --- 計算処理（演算子の優先順位を守る） ---
@@ -434,10 +451,10 @@ function calculate(tokens: string[]): number {
 
   let maxIterations = 1000; // 無限ループ防止用
 
-  // ① 関数の処理（sin, cos, tan, log, loge, sqrt）
+  // ① 関数の処理（sin, cos, tan, log, loge, sqrt, floor）
   let i = 0;
   while (i < tokens.length && maxIterations > 0) {
-    if (["sin", "cos", "tan", "log", "loge", "sqrt", "e^"].includes(tokens[i])) {
+    if (["sin", "cos", "tan", "log", "loge", "sqrt", "e^", "floor"].includes(tokens[i])) {
       if (i >= tokens.length - 1) {
         throw new Error(`不正な${tokens[i]}関数の使用です`);
       }
@@ -471,6 +488,9 @@ function calculate(tokens: string[]): number {
           break;
         case "e^":
           result = Math.exp(arg);
+          break;
+        case "floor":
+          result = Math.floor(arg);
           break;
         default:
           throw new Error("未実装の関数です");
@@ -901,6 +921,35 @@ function insertAbsAtCaret(el: HTMLElement) {
     selection.removeAllRanges();
     selection.addRange(newRange);
   }
+}
+
+// Add the insertFloorAtCaret function
+function insertFloorAtCaret(el: HTMLElement) {
+  // Clear display if it only contains "0"
+  if (((el.textContent ?? "").trim()) === "0") {
+    el.textContent = "";
+  }
+
+  const selection = window.getSelection();
+  if (!selection || !selection.rangeCount) return;
+
+  const range = selection.getRangeAt(0);
+  range.deleteContents();
+
+  const openFloor = document.createTextNode("⌊");
+  const emptyNode = document.createTextNode(""); // Placeholder for cursor
+  const closeFloor = document.createTextNode("⌋");
+
+  range.insertNode(closeFloor);
+  range.insertNode(emptyNode);
+  range.insertNode(openFloor);
+
+  // Set cursor between floor brackets
+  range.setStart(emptyNode, 0);
+  range.setEnd(emptyNode, 0);
+
+  selection.removeAllRanges();
+  selection.addRange(range);
 }
 
 

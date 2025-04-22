@@ -237,6 +237,12 @@ document.addEventListener("keydown", function (event) {
             insertPiAtCaret(display);
             return;
         }
+        // 床関数のショートカット (f)
+        if (event.key === "f" && event.altKey) {
+            event.preventDefault();
+            insertFunctionCallAtCaret(display, "floor");
+            return;
+        }
         // 特殊キーのショートカット処理
         if (event.key === "r" && event.altKey) {
             event.preventDefault();
@@ -282,12 +288,6 @@ document.addEventListener("keydown", function (event) {
         if (event.key === "t" && event.altKey) {
             event.preventDefault();
             insertFunctionCallAtCaret(display, "tan");
-            return;
-        }
-        // floor関数のショートカット (f)
-        if (event.key === "f" && event.altKey) {
-            event.preventDefault();
-            insertFunctionCallAtCaret(display, "floor");
             return;
         }
         event.preventDefault();

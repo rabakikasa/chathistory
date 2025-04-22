@@ -171,7 +171,7 @@ buttons.forEach(function (btn) {
     if (btn.classList.contains("floor")) {
         btn.addEventListener("click", function () {
             display.focus();
-            insertFunctionCallAtCaret(display, "floor");
+            insertFloorAtCaret(display);
             placeCaretAtEnd(display);
         });
         return;
@@ -284,12 +284,6 @@ document.addEventListener("keydown", function (event) {
             insertFunctionCallAtCaret(display, "tan");
             return;
         }
-        // floor関数のショートカット (f)
-        if (event.key === "f" && event.altKey) {
-            event.preventDefault();
-            insertFunctionCallAtCaret(display, "floor");
-            return;
-        }
         event.preventDefault();
         return;
     }
@@ -363,6 +357,12 @@ document.addEventListener("keydown", function (event) {
         insertAtCaret(display, event.key);
         return;
     }
+    // Floor function shortcut (f)
+    if (event.key === "f" && event.altKey) {
+        event.preventDefault();
+        insertFloorAtCaret(display);
+        return;
+    }
 });
 // カーソル位置にテキストを挿入
 function insertAtCaret(el, text) {
@@ -393,7 +393,7 @@ function placeCaretAtEnd(el) {
 // 計算関数は前の evaluateExpression を使ってOK！
 // --- 文字列をトークンに分ける ---
 function tokenize(expression) {
-    return expression.match(/(sin|cos|tan|e\^|loge|log|sqrt|\d+\.?\d*|\.\d+|\+|\-|\*|\/|\^|!|\(|\))/g) || [];
+    return expression.match(/(sin|cos|tan|e\^|loge|log|sqrt|floor|\d+\.?\d*|\.\d+|\+|\-|\*|\/|\^|!|\(|\)|\⌊|\⌋)/g) || [];
 }
 // --- 計算処理（演算子の優先順位を守る） ---
 function calculate(tokens) {
@@ -417,7 +417,7 @@ function calculate(tokens) {
         }
     }
     var maxIterations = 1000; // 無限ループ防止用
-    // ① 関数の処理（sin, cos, tan, log, loge, sqrt）
+    // ① 関数の処理（sin, cos, tan, log, loge, sqrt, floor）
     var i = 0;
     while (i < tokens.length && maxIterations > 0) {
         if (["sin", "cos", "tan", "log", "loge", "sqrt", "e^", "floor"].includes(tokens[i])) {
@@ -850,4 +850,28 @@ function insertAbsAtCaret(el) {
         selection.removeAllRanges();
         selection.addRange(newRange);
     }
+}
+// Add the insertFloorAtCaret function
+function insertFloorAtCaret(el) {
+    var _a;
+    // Clear display if it only contains "0"
+    if ((((_a = el.textContent) !== null && _a !== void 0 ? _a : "").trim()) === "0") {
+        el.textContent = "";
+    }
+    var selection = window.getSelection();
+    if (!selection || !selection.rangeCount)
+        return;
+    var range = selection.getRangeAt(0);
+    range.deleteContents();
+    var openFloor = document.createTextNode("⌊");
+    var emptyNode = document.createTextNode(""); // Placeholder for cursor
+    var closeFloor = document.createTextNode("⌋");
+    range.insertNode(closeFloor);
+    range.insertNode(emptyNode);
+    range.insertNode(openFloor);
+    // Set cursor between floor brackets
+    range.setStart(emptyNode, 0);
+    range.setEnd(emptyNode, 0);
+    selection.removeAllRanges();
+    selection.addRange(range);
 }
